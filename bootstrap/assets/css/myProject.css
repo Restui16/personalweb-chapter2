@@ -1,0 +1,275 @@
+.form-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+.form-project {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 50%;
+}
+
+.form-date-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.form-group .text {
+  height: 40px;
+}
+
+.form-group .checkbox-container {
+  display: flex;
+  gap: 100px;
+}
+
+.form-group .checkbox-container .checkbox-item-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.form-group .upload-image-container {
+  background-color: white;
+  border-radius: 4px;
+  height: 40px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+.form-group .upload-image-container label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.form-group .upload-image-container label div {
+  padding: 10px;
+  box-sizing: border-box;
+  background-color: #e4e4e4;
+  color: grey;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.form-group .upload-image-container label span {
+  flex: 1;
+  margin-left: 10px;
+}
+
+.form-group .upload-image-container label .icon-clip {
+  padding: 10px;
+  font-size: 20px;
+}
+
+.form-project input,
+textarea {
+  border: none;
+  border-radius: 5px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+.btn-action {
+  border-radius: 10px;
+  background-color: #2d3e50;
+  color: white;
+  border: none;
+}
+
+/* .parent {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.child {
+  flex: 1 0 25%;
+  margin: 50px;
+  height: 100px;
+  background-color: blue;
+} */
+
+.heading {
+  text-align: center;
+  text-transform: uppercase;
+}
+
+#myProject {
+  box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.2);
+  background-color: white;
+  padding: 40px;
+}
+
+.my-project-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 50px;
+  margin-top: 32px;
+}
+
+.my-project-menu {
+  flex: 1 0 25%;
+  text-decoration: none;
+  color: black;
+  cursor: pointer;
+}
+
+.my-project-item {
+  padding: 20px;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-direction: column;
+}
+
+.left-card-project {
+  flex: 1;
+  width: 100%;
+}
+
+.my-project-item .left-card-project img {
+  width: 100%;
+  border-radius: 10px;
+  height: 230px;
+  object-fit: cover;
+}
+
+.right-card-project {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.right-card-project h1 {
+  text-transform: capitalize;
+}
+
+.right-card-project h6 {
+  font-weight: 300;
+}
+
+.right-card-project p {
+  text-align: justify;
+}
+
+.right-card-project .icon-brand {
+  display: flex;
+  gap: 20px;
+  font-size: 30px;
+  margin-top: 10px;
+}
+
+.right-card-project .btn-action-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.main .container .title {
+  text-align: center;
+}
+
+.project-detail-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 30px;
+  gap: 50px;
+}
+
+.project-detail-container i {
+  margin-right: 10px;
+}
+
+.project-detail-container .image-container {
+  flex: 1 0 30%;
+  height: 500px;
+}
+
+.project-detail-container .image-container img {
+  width: 100%;
+  height: 100%;
+}
+
+.project-detail-container .detail-container {
+  flex: 1;
+  width: 100%;
+  height: 400px;
+  font-size: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.project-detail-container .detail-container .duration-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.project-detail-container .detail-container .technologies-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.technologies-container .technologies-item {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex: 1;
+}
+
+.description {
+  text-align: justify;
+  margin-top: 20px;
+}
+
+/* `sm` applies to x-small devices (portrait phones, less than 576px) */
+@media (max-width: 575.98px) {
+}
+
+/* `md` applies to small devices (landscape phones, less than 768px) */
+@media (max-width: 767.98px) {
+  .form-project {
+    width: 100%;
+  }
+
+  .form-date-container {
+    flex-direction: column;
+  }
+
+  .project-detail-container {
+    flex-direction: column;
+  }
+}
+
+/* `lg` applies to medium devices (tablets, less than 992px) */
+@media (max-width: 991.98px) {
+  
+}
+
+/* `xl` applies to large devices (desktops, less than 1200px) */
+@media (max-width: 1199.98px) {
+  .project-detail-container .detail-container {
+    font-size: 18px;
+  }
+}
+
+/* custom size */
+
+@media (max-width: 1308px) {
+ 
+}
+
+/* `xxl` applies to x-large devices (large desktops, less than 1400px) */
+@media (max-width: 1399.98px) {
+}
