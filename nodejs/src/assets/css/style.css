@@ -11,6 +11,15 @@ body {
   color: black;
 }
 
+.btn-custom-dark{
+  background-color: #2d3e50 !important;
+  color: white !important;
+}
+
+
+input, select, textarea {
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
 /* // X-Small devices (portrait phones, less than 576px)
 // No media query for `xs` since this is the default in Bootstrap */
 

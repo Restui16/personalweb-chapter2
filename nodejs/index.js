@@ -1,4 +1,5 @@
-const express = require("express");
+import express from 'express';
+import handlebars  from 'hbs';
 const app = express();
 const port = 3000;
 
@@ -6,86 +7,161 @@ app.set("view engine", "hbs"); // set view engine hbs
 
 app.set("views", "src/views"); // set path views to src/views
 
+app.use(express.urlencoded({ extended: false}));
+
 app.use("/assets", express.static("src/assets"));
 
 app.get("/", home);
 
 app.get("/contact", contact);
 
-app.get("/my-project", myProject);
+app.get("/add-project", addProject);
+
+app.post("/add-project", storeProject)
+
+app.get("/project/detail/:id", ProjectDetail);
+
+app.get("/project/delete/:id", deleteProject);
+
+app.get("/project/edit/:id", editProject)
+
+app.post("/project/update/:id", updateProject);
 
 app.get("/testimonial", testimonial);
 
-app.get("/my-project-detail/:title", myProjectDetail);
+
+
+const data = [];
+
+function durationMonth(startDate, endDate) {
+  const getObjStartDate = new Date(startDate);
+  const getObjEndDate = new Date(endDate);
+  return (
+    (getObjEndDate.getFullYear() - getObjStartDate.getFullYear()) * 12 +
+    (getObjEndDate.getMonth() - getObjStartDate.getMonth())
+  );
+}
+
+function formatDate(dates) {
+  //date formater d/mm/yyyy
+  const objDates = new Date(dates);
+  let minutes = objDates.getMinutes();
+  let hours = objDates.getHours();
+  const date = objDates.getDate();
+  const month = objDates.getMonth();
+  const year = objDates.getFullYear();
+
+  if (hours < 10) {
+    hours = "0" + hours;
+  }
+
+  if (minutes < 10) {
+    minutes = "0" + minutes;
+  }
+
+  const months = [
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+  ];
+
+  return `${date} ${months[month]} ${year}`;
+}
+
 
 function home(req, res) {
-  res.render("index");
+
+  res.render("index", {data});
 }
 
 function contact(req, res) {
   res.render("contact");
 }
 
-function myProject(req, res) {
-  const data = [
-    {
-      id: 1,
-      title: "App Management Asset",
-      startDate: new Date(2023 - 10 - 2),
-      endDate: new Date(2023 - 12 - 10),
-      description:
-        "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Nam et laborum rem deserunt distinctio neque tempore qui impedit veritatis aliquam suscipit Lorem ipsum dolor sit amet consectetur....",
-      nodejs: `fa-brands fa-node-js`,
-      laravel: `fa-brands fa-laravel`,
-      python: `fa-brands fa-python`,
-      reactjs: `fa-brands fa-react`,
-      image:
-        "https://images.unsplash.com/photo-1682687982046-e5e46906bc6e?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    },
-    {
-      id: 2,
-      title: "Point Of Sale",
-      startDate: new Date(2023 - 11 - 1),
-      endDate: new Date(2024 - 1 - 20),
-      description:
-        "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Nam et laborum rem deserunt distinctio neque tempore qui impedit veritatis aliquam suscipit Lorem ipsum dolor sit amet consectetur....",
-      nodejs: `fa-brands fa-node-js`,
-      laravel: `fa-brands fa-laravel`,
-      python: `fa-brands fa-python`,
-      reactjs: `fa-brands fa-react`,
-      image:
-        "https://images.unsplash.com/photo-1682687982046-e5e46906bc6e?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    },
-    {
-      id: 3,
-      title: "Personal Web",
-      startDate: new Date(2023 - 12 - 1),
-      endDate: new Date(2024 - 1 - 30),
-      description:
-        "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Nam et laborum rem deserunt distinctio neque tempore qui impedit veritatis aliquam suscipit Lorem ipsum dolor sit amet consectetur....",
-      nodejs: `fa-brands fa-node-js`,
-      laravel: `fa-brands fa-laravel`,
-      python: `fa-brands fa-python`,
-      reactjs: `fa-brands fa-react`,
-      image:
-        "https://images.unsplash.com/photo-1682687982046-e5e46906bc6e?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    },
-  ];
+function addProject(req, res) {
+  res.render("create-project");
+}
 
-  res.render("myProject", { data });
+function storeProject(req, res) {
+  const { projectName, startDate, endDate, description, tech } = req.body;
+  
+  const technologiesObj = {};
+  tech.forEach((technology) => {
+    technologiesObj[technology] = true;
+  });
+
+  const projectData = {
+    projectName,
+    startDate,
+    endDate,
+    duration: durationMonth(startDate, endDate),
+    description,
+    tech: technologiesObj,
+  };
+
+  data.push(projectData);
+
+  res.redirect("/");
+}
+
+function ProjectDetail(req, res) {
+  const { id } = req.params;
+
+  const projectDetail = data[id];
+  const getStartDate = formatDate(data[id].startDate);
+  const getEndDate = formatDate(data[id].endDate);
+  
+  res.render("show-project", { data: projectDetail, getStartDate, getEndDate });
+}
+
+function deleteProject (req, res) {
+  const { id } = req.params
+
+  data.splice(id, 1)
+
+  res.redirect("/")
+}
+
+function editProject(req, res) {
+  const { id } = req.params
+  
+  const projectDetail = data[id];
+  res.render("edit-project", {data: projectDetail, index: id})
+}
+
+function updateProject(req, res) {
+  const { id } = req.params;
+  
+  const { projectName, startDate, endDate, description } = req.body;
+  const updateData = {
+    projectName,
+    startDate,
+    endDate,
+    duration: durationMonth(startDate, endDate),
+    description,
+    tech : {
+      node: req.body.tech && req.body.tech.includes('node'),
+      laravel: req.body.tech && req.body.tech.includes('laravel'),
+      python: req.body.tech && req.body.tech.includes('python'),
+      react: req.body.tech && req.body.tech.includes('react'),
+    }
+  }
+
+  // function durationMonth(startDate, endDate) {
+  //   return (
+  //     (endDate.getFullYear() - startDate.getFullYear()) * 12 +
+  //     (endDate.getMonth() - startDate.getMonth())
+  //   );
+  // }
+  
+  data.splice(id, 1, updateData)
+
+  res.redirect("/");
 }
 
 function testimonial(req, res) {
   res.render("testimonial");
 }
 
-function myProjectDetail(req, res) {
-    let item = req.params;
-    console.log(item);
-  const { title } = req.params;
 
-  res.render("myProject-detail", { title });
-}
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);

@@ -29,14 +29,14 @@
                         <a class="nav-link active" aria-current="page" href="/">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/my-project">Add Project</a>
+                        <a class="nav-link" href="/add-project">Add Project</a>
                     </li>
                     {{!-- <li class="nav-item">
                         <a class="nav-link" href="/testimonial">Testimonials</a>
                     </li> --}}
                 </ul>
 
-                <a href="/contact" class="btn btn-secondary rounded-pill">Contact Me</a>
+                <a href="/contact" class="btn btn-custom-dark rounded-pill">Contact Me</a>
             </div>
         </div>
     </nav>
@@ -61,7 +61,7 @@
                                     berkolaborasi dalam mencapai tujuan bersama.
                                 </p>
                                 <div class="">
-                                    <button class="btn btn-secondary rounded-pill me-3">Contact Me</button>
+                                    <button class="btn btn-custom-dark rounded-pill me-3">Contact Me</button>
                                     <a href="" class="text-decoration-none text-muted">Download CV <i
                                             class="fa-solid fa-download"></i></a>
                                 </div>
@@ -91,39 +91,49 @@
             </div>
         </section>
 
-        <section class="mt-5" id="myProject">
+        {{#if data.length}}
+         <section class="mt-5" id="myProject">
             <div class="card shadow">
                 <div class="card-body">
-                    <h1 class="text-center mb-3 fw-bold">My Project</h1>
+                    <h1 class="text-center fw-bold my-5">MY PROJECT</h1>
                     <div class="container">
-                        <div class="row" id="projectItem">
-                            <!-- <div class="col-md-6 col-lg-4 col-12 mb-3">
+                        <div class="row">
+                            {{#each data}}
+                            <div class="col-md-6 col-lg-4 col-12 mb-3">
                                 <div class="card">
                                     <img src="assets/img/img1.jpg" class="rounded-top" alt="">
                                     <div class="card-body">
-                                        <h1 class="text-uppercase text-break">Title</h1>
-                                        <p class="text-muted">Duration : 4 Month</p>
-                                        <p class="text-break">Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                                            Voluptas sequi saepe reprehenderit asperiores earum dignissimos! ... <a href="myProject-detail.html">Read More</a></p>
+                                        <h4 class="text-uppercase text-break">{{this.projectName}}</h4>
+                                        <p class="text-muted">Duration : {{ this.duration }} Month </p>
+                                        <p class="text-break">{{this.description}}<a href="/project/detail/{{@index}}" target="_blank">Read More</a></p>
                                         <div class="icon-tech fs-2 mb-2" id="iconTech">
-                                            <i class="fa-brands fa-node-js"></i>
-                                            <i class="fa-brands fa-laravel"></i>
-                                            <i class="fa-brands fa-python"></i>
-                                            <i class="fa-brands fa-react"></i>
+                                            {{#if this.tech.node}}
+                                                <i class="fa-brands fa-node"></i>
+                                            {{/if}}
+                                            {{#if this.tech.laravel}}
+                                                <i class="fa-brands fa-laravel"></i>
+                                            {{/if}}
+                                            {{#if this.tech.python}}
+                                                <i class="fa-brands fa-python"></i>
+                                            {{/if}}
+                                            {{#if this.tech.react}}
+                                                <i class="fa-brands fa-react"></i>
+                                            {{/if}}
                                         </div>
-
                                         <div class="d-flex justify-content-between align-items-center gap-2">
-                                            <a href="#" class="btn btn-secondary flex-grow-1">Edit</a>
-                                            <a href="#" class="btn btn-secondary flex-grow-1">Delete</a>
+                                            <a href="/project/edit/{{@index}}" class="btn btn-custom-dark flex-grow-1">Edit</a>
+                                            <a href="/project/delete/{{@index}}" class="btn btn-custom-dark flex-grow-1">Delete</a>
                                         </div>
                                     </div>
                                 </div>
-                            </div> -->
+                            </div>
+                            {{/each}}
                         </div>
                     </div>
                 </div>
             </div>
         </section>
+        {{/if}}
     </main>
 
     <!-- <script src="assets/js/nav.js"></script> -->
