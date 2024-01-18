@@ -1,5 +1,5 @@
 import express from 'express';
-import handlebars  from 'hbs';
+
 const app = express();
 const port = 3000;
 
@@ -69,7 +69,13 @@ function formatDate(dates) {
 
 function home(req, res) {
 
-  res.render("index", {data});
+  const dataWithDurationProject = data.map(value => ({
+    ...value,
+    durationProject: durationMonth(value.startDate, value.endDate)
+  }));
+  
+
+  res.render("index", {data: dataWithDurationProject});
 }
 
 function contact(req, res) {
@@ -81,18 +87,21 @@ function addProject(req, res) {
 }
 
 function storeProject(req, res) {
-  const { projectName, startDate, endDate, description, tech } = req.body;
+  let { projectName, startDate, endDate, description, tech } = req.body;
   
-  const technologiesObj = {};
-  tech.forEach((technology) => {
-    technologiesObj[technology] = true;
-  });
+  let technologiesObj = {};
+
+  if(tech){
+    tech.forEach((value, index) => {
+      technologiesObj[value] = true;
+    });
+  }
+  
 
   const projectData = {
     projectName,
     startDate,
     endDate,
-    duration: durationMonth(startDate, endDate),
     description,
     tech: technologiesObj,
   };
@@ -135,7 +144,6 @@ function updateProject(req, res) {
     projectName,
     startDate,
     endDate,
-    duration: durationMonth(startDate, endDate),
     description,
     tech : {
       node: req.body.tech && req.body.tech.includes('node'),
@@ -144,13 +152,6 @@ function updateProject(req, res) {
       react: req.body.tech && req.body.tech.includes('react'),
     }
   }
-
-  // function durationMonth(startDate, endDate) {
-  //   return (
-  //     (endDate.getFullYear() - startDate.getFullYear()) * 12 +
-  //     (endDate.getMonth() - startDate.getMonth())
-  //   );
-  // }
   
   data.splice(id, 1, updateData)
 

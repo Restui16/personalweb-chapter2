@@ -90,12 +90,12 @@
                 </div>
             </div>
         </section>
-
+        
         {{#if data.length}}
          <section class="mt-5" id="myProject">
             <div class="card shadow">
                 <div class="card-body">
-                    <h1 class="text-center fw-bold my-5">MY PROJECT</h1>
+                    <h1 class="text-center fw-bold my-5">  MY PROJECT</h1>
                     <div class="container">
                         <div class="row">
                             {{#each data}}
@@ -104,10 +104,13 @@
                                     <img src="assets/img/img1.jpg" class="rounded-top" alt="">
                                     <div class="card-body">
                                         <h4 class="text-uppercase text-break">{{this.projectName}}</h4>
-                                        <p class="text-muted">Duration : {{ this.duration }} Month </p>
+                                        <p class="text-muted">Duration : {{ this.durationProject }} Month </p>
                                         <p class="text-break">{{this.description}}<a href="/project/detail/{{@index}}" target="_blank">Read More</a></p>
                                         <div class="icon-tech fs-2 mb-2" id="iconTech">
-                                            {{#if this.tech.node}}
+                                            {{#each this.tech}}
+                                             <i class="{{#if this}} fa-brands fa-{{@key}} {{/if}}"></i>               
+                                            {{/each}}
+                                            {{!-- {{#if this.tech.node}}
                                                 <i class="fa-brands fa-node"></i>
                                             {{/if}}
                                             {{#if this.tech.laravel}}
@@ -118,7 +121,7 @@
                                             {{/if}}
                                             {{#if this.tech.react}}
                                                 <i class="fa-brands fa-react"></i>
-                                            {{/if}}
+                                            {{/if}} --}}
                                         </div>
                                         <div class="d-flex justify-content-between align-items-center gap-2">
                                             <a href="/project/edit/{{@index}}" class="btn btn-custom-dark flex-grow-1">Edit</a>
