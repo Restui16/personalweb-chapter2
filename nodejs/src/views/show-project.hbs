@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Project Detail</title>
+    <title>Personal Web | {{title}}</title>
     {{! <link rel="stylesheet" href="assets/css/app.css" /> }}
     {{! <link rel="stylesheet" href="assets/css/myProject.css" /> }}
     <link rel="stylesheet" href="/assets/css/style.css" />
@@ -54,10 +54,10 @@
     <main class="my-5">
       <div class="container">
         <div class="row">
-          <h1 class="text-center text-uppercase fw-bold my-4">{{data.projectName}}</h1>
+          <h1 class="text-center text-uppercase fw-bold my-4">{{dataProject.project_name}}</h1>
           <div class="col-12 col-lg-6 mb-5 d-flex">
             <img
-              src="/assets/img/img2.jpg"
+              src="/assets/img/img1.jpg"
               class="w-100 h-100 object-fit-cover"
               alt=""
             />
@@ -67,44 +67,26 @@
               <h4 class="mb-3 fw-bold">Duration</h4>
               <span class="col-12 mb-3 fs-3">
                 <i class="fa-solid fa-calendar-days me-3"></i>
-                {{getStartDate}} - {{getEndDate}}
+                {{formatStartDate}} - {{formatEndDate}}
               </span>
               <span class="col-12 mb-3 fs-3">
                 <i class="fa-regular fa-clock me-3"></i>
-                {{data.duration}} Month
+               {{duration_project}}
               </span>
               <h4 class="fw-bold">Technologies</h4>
-              {{#if data.tech.node}}
-              <span class="col-6 mb-3 fs-3">
-                <i class="fa-brands fa-node me-3"></i>
-                Node Js
-              </span>
-              {{/if}}
-              {{#if data.tech.laravel}}
-              <span class="col-6 mb-3 fs-3">
-                <i class="fa-brands fa-laravel me-3"></i>
-                Laravel
-              </span>
-              {{/if}}
-              {{#if data.tech.python}}
-              <span class="col-6 mb-3 fs-3">
-                <i class="fa-brands fa-python me-3"></i>
-                Python
-              </span>
-              {{/if}}
-              {{#if data.tech.react}}
-              <span class="col-6 mb-3 fs-3">
-                <i class="fa-brands fa-react me-3"></i>
-                React Js
-              </span>
-              {{/if}}
+              {{#each dataProject.tech}}
+                <span class="col-6 mb-3 fs-3 text-capitalize">
+                  <i class="fa-brands fa-{{this}} me-3"></i>
+                  {{this}}
+                </span>
+              {{/each}}
             </div>
           </div>
         </div>
 
         <div class="row">
-          <p style="text-align: justify;">
-            {{data.description}}
+          <p class="fs-4" style="text-align: justify;">
+            {{dataProject.description}}
           </p>
         </div>
       </div>
