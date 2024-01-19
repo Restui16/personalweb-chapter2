@@ -54,7 +54,7 @@ app.post("/project/update/:id", updateProject);
 
 app.get("/testimonial", testimonial);
 
-const data = [];
+const data = ['test'];
 
   hbs.registerHelper('arrayContains', function (array, value) {
     return array.includes(value);
