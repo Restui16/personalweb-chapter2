@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Project</title>
+    <title>Personal Web | {{title}}</title>
     <!-- <link rel="stylesheet" href="assets/css/app.css"> -->
     <!-- <link rel="stylesheet" href="assets/css/myProject.css"> -->
     <link rel="stylesheet" href="/assets/css/style.css">
@@ -43,50 +43,52 @@
         <section id="addProject" class="container-fluid">
             <h1 class="text-center text-uppercase mb-3">Edit Project</h1>
             <div class="col-lg-4 col-md-6 col-sm-8 x col-xs-12 mx-auto">
-                <form action="/project/update/{{index}}" method="POST">
+                <form action="/project/update/{{dataProject.id}}" method="POST">
                     <div class="row">
                         <div class="col-12 mb-3">
                             <div class="form-group">
                                 <label for="projectName">Project Name</label>
-                                <input type="text" id="projectName" name="projectName" value="{{data.projectName}}" class="form-control" required>
+                                <input type="text" id="projectName" name="projectName" value="{{dataProject.project_name}}" class="form-control" required>
                             </div>
                         </div>
 
                         <div class="col-md-6 col-12 mb-3">
                             <div class="form-group">
                                 <label for="startDate">Start Date</label>
-                                <input type="date" id="startDate" name="startDate" value="{{data.startDate}}" class="form-control" required>
+                                <input type="date" id="startDate" name="startDate" value="{{dataProject.start_date}}" class="form-control" required>
                             </div>
                         </div>
 
                         <div class="col-md-6 col-12 mb-3">
                             <div class="form-group">
                                 <label for="endDate">End Date</label>
-                                <input type="date" id="endDate" name="endDate" value="{{data.endDate}}" class="form-control" required>
+                                <input type="date" id="endDate" name="endDate" value="{{dataProject.end_date}}" class="form-control" required>
                             </div>
                         </div>
 
                         <div class="col-12 mb-3">
                             <div class="form-group">
                                 <label for="description">Description</label>
-                                <textarea id="description" name="description" class="form-control" required>{{data.description}}</textarea>
+                                <textarea id="description" name="description" class="form-control" required>{{dataProject.description}}</textarea>
                             </div>
                         </div>
+
+                        <!-- show-project.hbs -->
 
                         <div class="col-12 mb-3">
                             <label for="">Technologies</label>
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="tech" value="node" id="node" {{#if data.tech.node}} checked {{/if}}>
-                                        <label class="form-check-label" for="node">
+                                        <input class="form-check-input" type="checkbox" name="tech" value="node-js" id="node-js" {{#if (arrayContains dataProject.tech "node-js")}} checked {{/if}}>
+                                        <label class="form-check-label" for="node-js">
                                             Node Js
                                         </label>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="tech" value="laravel" id="laravel" {{#if data.tech.laravel}} checked {{/if}}>
+                                        <input class="form-check-input" type="checkbox" name="tech" value="laravel" id="laravel" {{#if (arrayContains dataProject.tech "laravel")}} checked {{/if}}>
                                         <label class="form-check-label" for="laravel">
                                             Laravel
                                         </label>
@@ -94,7 +96,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="tech" value="python" id="python" {{#if data.tech.python}} checked {{/if}}>
+                                        <input class="form-check-input" type="checkbox" name="tech" value="python" id="python" {{#if (arrayContains dataProject.tech "python")}} checked {{/if}}>
                                         <label class="form-check-label" for="python">
                                             Python
                                         </label>
@@ -102,7 +104,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="tech" value="react" id="react" {{#if data.tech.react}} checked {{/if}}>
+                                        <input class="form-check-input" type="checkbox" name="tech" value="react" id="react" {{#if (arrayContains dataProject.tech "react")}} checked {{/if}}>
                                         <label class="form-check-label" for="react">
                                             React Js
                                         </label>
@@ -110,6 +112,7 @@
                                 </div>
                             </div>
                         </div>
+
 
                         <div class="col-12 mb-3">
                             <div class="form-group">
@@ -126,13 +129,14 @@
         </section>
     </main>
 
-    <script src="assets/js/myProject.js"></script>
+    <script src="/assets/js/myProject.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
         integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
         crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
         integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
         crossorigin="anonymous"></script>
+
 </body>
 
 </html>
