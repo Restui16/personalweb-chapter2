@@ -4,9 +4,6 @@ const hbs = require("hbs");
 const app = express();
 const port = 3000;
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
-});
 
 const { development } = require("./src/config/config.json");
 const { Sequelize, QueryTypes, ARRAY } = require("sequelize");
@@ -26,7 +23,7 @@ async function connectToDatabase() {
   }
 }
 
-connectToDatabase();
+// connectToDatabase();
 
 app.set("view engine", "hbs"); // set view engine hbs
 
@@ -185,14 +182,15 @@ async function projectDetail(req, res) {
     
     const projectDetail = query.map(value => ({
       ...value,
+      duration_project: calculateDuration(value.start_date, value.end_date),
+      formatStartDate: formatDate(value.start_date),
+      formatEndDate: formatDate(value.end_date)
     }))
 
-    const [ dataProject ] = projectDetail;
-    const duration_project = calculateDuration(dataProject.start_date, dataProject.end_date)
-    const formatStartDate = formatDate(dataProject.start_date);
-    const formatEndDate = formatDate(dataProject.end_date);
+    const [dataProject] = projectDetail
+    
     const title = "Detail Project"
-    res.render("show-project", { dataProject, title, duration_project, formatStartDate, formatEndDate });
+    res.render("show-project", { dataProject, title});
   } catch (error) {
     throw error;
   }
@@ -213,15 +211,18 @@ async function editProject(req, res) {
   const { id } = req.params;
   try {
     const query = await SequelizePool.query(
-      `SELECT * FROM projects WHERE id = ${id}`, { type: QueryTypes.SELECT});
+      `SELECT * FROM projects WHERE id = ${id}`, { type: QueryTypes.SELECT });
     // console.log(query);
-
-    const [ dataProject ] = query;
-    console.log(query[0]);
-  
-    // console.log(projectDetail);
+    
+    const projectDetail = query.map(value => ({
+      ...value,
+      startDate: value.start_date.toISOString().split("T")[0],
+      endDate: value.end_date.toISOString().split("T")[0],
+    }))
+    const [ dataProject ] = projectDetail
+    
     const title = "Edit Project"
-    res.render("edit-project", { dataProject, title });
+    res.render("edit-project", {dataProject, title})
   } catch (error) {
     throw error;
   }
@@ -262,3 +263,6 @@ function testimonial(req, res) {
 }
 
 
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`);
+});
