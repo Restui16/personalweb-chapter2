@@ -83,11 +83,11 @@
               <h4 class="mb-3 fw-bold">Duration</h4>
               <span class="col-12 mb-3 fs-3">
                 <i class="fa-solid fa-calendar-days me-3"></i>
-                {{formatStartDate}} - {{formatEndDate}}
+                {{dataProject.formatStartDate}} - {{dataProject.formatEndDate}}
               </span>
               <span class="col-12 mb-3 fs-3">
                 <i class="fa-regular fa-clock me-3"></i>
-               {{duration_project}}
+               {{dataProject.duration_project}}
               </span>
               <h4 class="fw-bold">Technologies</h4>
               {{#each dataProject.tech}}

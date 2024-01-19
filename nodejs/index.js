@@ -8,9 +8,6 @@ const session = require("express-session");
 const app = express();
 const port = 3000;
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
-});
 
 app.set("view engine", "hbs"); // set view engine hbs
 app.set("views", "src/views"); // set path views to src/views
@@ -58,6 +55,36 @@ async function connectToDatabase() {
     console.error("Unable to connect to the database:", error);
   }
 }
+
+// connectToDatabase();
+
+app.set("view engine", "hbs"); // set view engine hbs
+
+app.set("views", "src/views"); // set path views to src/views
+
+app.use(express.urlencoded({ extended: false }));
+
+app.use("/assets", express.static("src/assets"));
+
+app.get("/", home);
+
+app.get("/contact", contact);
+
+app.get("/add-project", addProject);
+
+app.post("/add-project", storeProject);
+
+app.get("/project/detail/:id", projectDetail);
+
+app.get("/project/delete/:id", deleteProject);
+
+app.get("/project/edit/:id", editProject);
+
+app.post("/project/update/:id", updateProject);
+
+app.get("/testimonial", testimonial);
+
+const data = ['test'];
 connectToDatabase();
 
 hbs.registerHelper('arrayContains', function (array, value) {
@@ -202,13 +229,15 @@ async function projectDetail(req, res) {
     
     const projectDetail = query.map(value => ({
       ...value,
+      duration_project: calculateDuration(value.start_date, value.end_date),
+      formatStartDate: formatDate(value.start_date),
+      formatEndDate: formatDate(value.end_date)
     }))
 
-    const [ dataProject ] = projectDetail;
-    const duration_project = calculateDuration(dataProject.start_date, dataProject.end_date)
-    const formatStartDate = formatDate(dataProject.start_date);
-    const formatEndDate = formatDate(dataProject.end_date);
+    const [dataProject] = projectDetail
+    
     const title = "Detail Project"
+    res.render("show-project", { dataProject, title});
     res.render("show-project", { 
       dataProject, 
       title, 
@@ -238,14 +267,18 @@ async function editProject(req, res) {
   const { id } = req.params;
   try {
     const query = await SequelizePool.query(
-      `SELECT * FROM projects WHERE id = ${id}`, { type: QueryTypes.SELECT});
+      `SELECT * FROM projects WHERE id = ${id}`, { type: QueryTypes.SELECT });
     // console.log(query);
-
-    const [ dataProject ] = query;
-    console.log(query[0]);
-  
-    // console.log(projectDetail);
+    
+    const projectDetail = query.map(value => ({
+      ...value,
+      startDate: value.start_date.toISOString().split("T")[0],
+      endDate: value.end_date.toISOString().split("T")[0],
+    }))
+    const [ dataProject ] = projectDetail
+    
     const title = "Edit Project"
+    res.render("edit-project", {dataProject, title})
     res.render("edit-project", { 
       dataProject, 
       title, 
@@ -346,3 +379,6 @@ function testimonial(req, res) {
 }
 
 
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`);
+});
