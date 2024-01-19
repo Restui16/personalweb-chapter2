@@ -4,6 +4,7 @@ const { development } = require("./src/config/config.json");
 const { Sequelize, QueryTypes, ARRAY } = require("sequelize");
 const bcrypt = require("bcrypt");
 const session = require("express-session");
+const flash = require("express-flash");
 
 const app = express();
 const port = 3000;
@@ -24,6 +25,8 @@ app.use(session({
   secret: 'session_storage',
   saveUninitialized: true
 }))
+
+app.use(flash());
 
 app.get("/", home);
 app.get("/contact", contact);
@@ -213,9 +216,10 @@ async function storeProject(req, res) {
         project_name, start_date, end_date, description, tech, "createdAt", "updatedAt"
       ) VALUES (
         '${projectName}', '${startDate}', '${endDate}', '${description}', ARRAY['${tech.join("','")}'::character varying], NOW(), NOW())`);
-
+    req.flash('success', 'Project has been created');    
     res.redirect('/');
   } catch (error) {
+    req.flash('error', 'Project has failed to create'); 
     throw error;
   }
 }
@@ -237,13 +241,9 @@ async function projectDetail(req, res) {
     const [dataProject] = projectDetail
     
     const title = "Detail Project"
-    res.render("show-project", { dataProject, title});
     res.render("show-project", { 
       dataProject, 
       title, 
-      duration_project, 
-      formatStartDate, 
-      formatEndDate, 
       isLogin: req.session.isLogin, 
       user: req.session.user  
     });
@@ -256,6 +256,7 @@ async function deleteProject(req, res) {
   const { id } = req.params;
   try {
     await SequelizePool.query(`DELETE FROM projects WHERE id = ${id}`)
+    req.flash('success', 'Project has been deleted')
     res.redirect("/");
 
   } catch (error) {
@@ -278,7 +279,6 @@ async function editProject(req, res) {
     const [ dataProject ] = projectDetail
     
     const title = "Edit Project"
-    res.render("edit-project", {dataProject, title})
     res.render("edit-project", { 
       dataProject, 
       title, 
@@ -296,7 +296,7 @@ async function updateProject(req, res) {
     const { projectName, startDate, endDate, description, tech } = req.body;
     
     await SequelizePool.query(`UPDATE projects SET project_name='${projectName}', start_date='${startDate}', end_date='${endDate}', description='${description}', tech=ARRAY['${tech.join("','")}'::character varying], "updatedAt"=NOW()  WHERE id = ${id}`);
-
+    req.flash('success', 'Project has been updated')
     res.redirect("/");
   } catch (error) {
     throw error
@@ -319,21 +319,21 @@ async function handleLogin(req, res) {
     const checkEmail = await SequelizePool.query(`SELECT * FROM users where email = '${email}'`, {type: QueryTypes.SELECT})
 
     if(!checkEmail.length){
-      return res.redirect('/login');
+      req.flash('error', 'These credentials do not match our records.');
+      res.redirect('/login');
     }
 
     bcrypt.compare(password, checkEmail[0].password, function(err, result) {
       if(!result){
+        req.flash('error', 'These credentials do not match our records.');
         return res.redirect('/login');
       } else {
         req.session.isLogin = true;
         req.session.user = checkEmail[0].name
+        req.flash('success', 'You have successfully logged in')
         return res.redirect('/');
       }
     })
-
-
-
   } catch (error) {
     console.log(error);
   }
@@ -368,6 +368,7 @@ async function handleRegister(req, res) {
 function logout(req, res) {
   if(req.session.isLogin) {
     req.session.isLogin = false;
+    req.flash('success', 'Logout successful')
     res.redirect("/");
   } else {
     res.redirect("/");
@@ -377,7 +378,6 @@ function testimonial(req, res) {
   
   res.render("testimonial");
 }
-
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);

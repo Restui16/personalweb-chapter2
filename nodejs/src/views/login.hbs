@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{title}}</title>
     <!-- <link rel="stylesheet" href="assets/css/app.css"> -->
+    <link rel="icon" type="image/x-icon" href="/assets/img/logo.png">
     <link rel="stylesheet" href="assets/css/style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
@@ -65,17 +66,27 @@
         <div>
             <img src="/assets/img/dumbways.png" class="" style="width: 100px;" alt="logo">
         </div>
-        <div class="card col-lg-5 col-md-6 col-sm-8 x col-xs-12 border-0 rounded-4 shadow">
+        <div class="card col-lg-5 col-md-8 col-sm-12 x col-xs-12 border-0 rounded-4 shadow">
             <div class="card-body">
                 <form action="/login" method="post">
                     <div class="row">
                         <div class="mb-4">
                             <label for="email" class="fw-bold fs-5">Email</label>
-                            <input type="email" name="email" id="email" class="form-control">
+                            <input type="email" name="email" id="email" class="form-control {{#if messages.error}} is-invalid {{/if}}">
+                            {{#if messages.error}}
+                                <div class="invalid-feedback">
+                                    {{messages.error}}
+                                </div>
+                            {{/if}}
                         </div>
                         <div class="mb-4">
                             <label for="password" class="fw-bold fs-5">Password</label>
-                            <input type="password" name="password" id="password" class="form-control">
+                            <input type="password" name="password" id="password" class="form-control {{#if messages.error}} is-invalid {{/if}}">
+                            {{#if messages.error}}
+                                <div class="invalid-feedback">
+                                    {{messages.error}}
+                                </div>
+                            {{/if}}
                         </div>
                     </div>
                     <div class="d-flex justify-content-end align-items-center gap-3">
@@ -89,12 +100,41 @@
     </main>
 
     <!-- <script src="assets/js/nav.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
         integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
         crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
         integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
         crossorigin="anonymous"></script>
+
+    <script>
+        const successMessage = `{{messages.success}}`;
+        const errorMessage = `{{messages.error}}`;
+        if(successMessage){
+            Swal.fire({
+            toast: true,
+            title : 'Yeay!',
+            text : successMessage,
+            icon : 'success',
+            position : 'top-end',
+            showConfirmButton: false,
+            timerProgressBar: true,
+            timer: 3000
+        });
+        } else if (errorMessage) {
+            Swal.fire({
+            toast: true,
+            title: 'Opps!',
+            html: errorMessage,
+            icon: 'error',
+            position: 'top-end',
+            showConfirmButton: false,
+            timerProgressBar: true,
+            timer: 3000
+        });
+        }
+    </script>
 </body>
 
 </html>

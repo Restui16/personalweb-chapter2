@@ -124,26 +124,15 @@
                                     <h4 class="text-uppercase text-break">{{this.project_name}}</h4>
                                     <p class="text-muted">Duration : {{ this.duration_project }}</p>
                                     <p class="text-break" style="text-align: justify;">{{this.subs_desc}}<a href="/project/detail/{{this.id}}" target="_blank">...Read More</a></p>
-                                    <div class="d-flex gap-3 fs-2 mb-4" id="iconTech">
+                                    <div class="d-flex gap-3 fs-2 mb-4 mt-auto" id="iconTech">
                                         {{#each this.tech}}
-                                            <i class="{{#if this}} fa-brands fa-{{@this}} {{/if}}"></i>               
+                                            <i class="fa-brands fa-{{@this}}"></i>               
                                         {{/each}}
-                                        {{!-- {{#if this.tech.node}}
-                                            <i class="fa-brands fa-node"></i>
-                                        {{/if}}
-                                        {{#if this.tech.laravel}}
-                                            <i class="fa-brands fa-laravel"></i>
-                                        {{/if}}
-                                        {{#if this.tech.python}}
-                                            <i class="fa-brands fa-python"></i>
-                                        {{/if}}
-                                        {{#if this.tech.react}}
-                                            <i class="fa-brands fa-react"></i>
-                                        {{/if}} --}}
                                     </div>
-                                    <div class="d-flex justify-content-between align-items-center gap-2 mt-auto">
+                                    
+                                    <div class="d-flex justify-content-between align-items-center gap-2">
                                         <a href="/project/edit/{{this.id}}" class="btn btn-custom-dark flex-grow-1">Edit</a>
-                                        <a href="/project/delete/{{this.id}}" class="btn btn-custom-dark flex-grow-1">Delete</a>
+                                        <button data-id="{{this.id}}" onclick="confirmDelete(this)" class="btn btn-custom-dark flex-grow-1">Delete</button>
                                     </div>
                                 </div>
                             </div>
@@ -157,12 +146,60 @@
     </main>
 
     <!-- <script src="assets/js/nav.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
         integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
         crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
         integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
         crossorigin="anonymous"></script>
+    <script>
+        const successMessage = `{{messages.success}}`;
+        const errorMessage = `{{messages.error}}`;
+        if(successMessage){
+            Swal.fire({
+            toast: true,
+            title : 'Yeay!',
+            text : successMessage,
+            icon : 'success',
+            position : 'top-end',
+            showConfirmButton: false,
+            timerProgressBar: true,
+            timer: 3000
+        });
+        } else if (errorMessage) {
+            Swal.fire({
+            toast: true,
+            title: 'Opps!',
+            html: errorMessage,
+            icon: 'error',
+            position: 'top-end',
+            showConfirmButton: false,
+            timerProgressBar: true,
+            timer:3000
+        });
+        }
+    </script>
+
+    <script>
+        function confirmDelete(e) {
+            const projectId = e.getAttribute('data-id');
+            
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then(function (result){
+                if(result.isConfirmed){
+                    window.location.href = `/project/delete/${projectId}`
+                }
+            })
+        }
+    </script>
 </body>
 
 </html>
