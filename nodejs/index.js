@@ -96,13 +96,13 @@ const data = [];
       durationString += months + ' Month ';
     }
     if (days > 0) {
-      durationString += days + ' Day';
+       durationString += days + ' Day';
     }
   
     return durationString.trim(); // Hilangkan spasi ekstra di akhir
   }
 
-  
+    
 function formatDate(dates) {
   //date formater d/mm/yyyy
   let objDates;
