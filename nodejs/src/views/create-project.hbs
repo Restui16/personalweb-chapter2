@@ -14,10 +14,10 @@
 
 <body>
 
-    <nav class="navbar sticky-top navbar-expand-lg bg-white shadow z-3">
+     <nav class="navbar sticky-top navbar-expand-lg bg-white shadow z-3">
         <div class="container">
             <a class="navbar-brand" href="/">
-                <img src="assets/img/logo.png" alt="">
+                <img src="/assets/img/logo.png" alt="">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                 data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
@@ -30,11 +30,33 @@
                         <a class="nav-link" href="/">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/add-project">Add Project</a>
+                        <a class="nav-link fw-bold active" aria-current="page" href="/add-project">Add Project</a>
                     </li>
                 </ul>
 
-                <a href="/contact" class="btn btn-custom-dark rounded-pill">Contact Me</a>
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    {{#if isLogin}}
+                        <li class="nav-item dropdown me-3">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Hallo, {{ user }}
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item" href="#">
+                                        Profile
+                                        <i class="fa-solid fa-user ms-2 text-secondary"></i> 
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#">Logout <i class="fa-solid fa-right-from-bracket text-danger ms-2"></i></a></li>
+                            </ul>
+                        </li>
+                    {{else}}
+                    <li class="nav-item"> <a class="nav-link" href="/register">Register</a> </li>
+                    <li class="nav-item me-3"> <a class="nav-link" href="/login">Login</a> </li>
+                    {{/if}}
+                    <li class="nav-item"><a href="/contact" class="btn btn-custom-dark rounded-pill">Contact Me</a></li>
+                </ul>
             </div>
         </div>
     </nav>

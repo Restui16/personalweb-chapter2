@@ -1,5 +1,9 @@
 const express = require("express");
 const hbs = require("hbs");
+const { development } = require("./src/config/config.json");
+const { Sequelize, QueryTypes, ARRAY } = require("sequelize");
+const bcrypt = require("bcrypt");
+const session = require("express-session");
 
 const app = express();
 const port = 3000;
@@ -8,14 +12,43 @@ app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
 
-const { development } = require("./src/config/config.json");
-const { Sequelize, QueryTypes, ARRAY } = require("sequelize");
+app.set("view engine", "hbs"); // set view engine hbs
+app.set("views", "src/views"); // set path views to src/views
+app.use(express.urlencoded({ extended: false }));
+app.use("/assets", express.static("src/assets"));
+app.use(session({
+  cookie: {
+    httpOnly: true,
+    secure: false,
+    maxAge: 2 * 60 * 60 * 1000,
+  },
+  resave: false,
+  store: session.MemoryStore(),
+  secret: 'session_storage',
+  saveUninitialized: true
+}))
+
+app.get("/", home);
+app.get("/contact", contact);
+app.get("/add-project", addProject);
+app.post("/add-project", storeProject);
+app.get("/project/detail/:id", projectDetail);
+app.get("/project/delete/:id", deleteProject);
+app.get("/project/edit/:id", editProject);
+app.post("/project/update/:id", updateProject);
+app.get("/login", formLogin);
+app.post("/login", handleLogin);
+app.get("/register", formRegister);
+app.post("/register", handleRegister);
+app.get("/logout", logout);
+app.get("/testimonial", testimonial);
+
+
+
 const SequelizePool = new Sequelize(development);
 let models = require("./src/models");
 const project = require("./src/models/project");
 const { types } = require("pg");
-// console.log(models);
-
 
 async function connectToDatabase() {
   try {
@@ -25,84 +58,53 @@ async function connectToDatabase() {
     console.error("Unable to connect to the database:", error);
   }
 }
-
 connectToDatabase();
 
-app.set("view engine", "hbs"); // set view engine hbs
+hbs.registerHelper('arrayContains', function (array, value) {
+  return array.includes(value);
+});
 
-app.set("views", "src/views"); // set path views to src/views
+function calculateDuration(startDate, endDate) {
 
-app.use(express.urlencoded({ extended: false }));
+  let getObjStartDate;
+  let getObjEndDate;
 
-app.use("/assets", express.static("src/assets"));
-
-app.get("/", home);
-
-app.get("/contact", contact);
-
-app.get("/add-project", addProject);
-
-app.post("/add-project", storeProject);
-
-app.get("/project/detail/:id", projectDetail);
-
-app.get("/project/delete/:id", deleteProject);
-
-app.get("/project/edit/:id", editProject);
-
-app.post("/project/update/:id", updateProject);
-
-app.get("/testimonial", testimonial);
-
-const data = ['test'];
-
-  hbs.registerHelper('arrayContains', function (array, value) {
-    return array.includes(value);
-  });
-
-  
-  function calculateDuration(startDate, endDate) {
-
-    let getObjStartDate;
-    let getObjEndDate;
-
-    if(startDate instanceof Date && endDate instanceof Date){
-      getObjStartDate = startDate;
-      getObjEndDate = endDate;
-    } else {
-      getObjStartDate = new Date(startDate);
-      getObjEndDate = new Date(endDate);
-    }
-
-    const totalMilliseconds = getObjEndDate - getObjStartDate;
-  
-    // Konversi ke hari, jam, menit, detik, dan milidetik
-    const totalSeconds = totalMilliseconds / 1000;
-    const totalMinutes = totalSeconds / 60;
-    const totalHours = totalMinutes / 60;
-    const totalDays = totalHours / 24;
-  
-    // Hitung jumlah tahun, bulan, dan sisa hari
-    const years = Math.floor(totalDays / 365);
-    const months = Math.floor((totalDays % 365) / 30); // perkiraan 30 hari per bulan
-    const days = Math.floor(totalDays % 30);
-  
-    // Buat string durasi
-    let durationString = '';
-    if (years > 0) {
-      durationString += years + ' Year ';
-    }
-    if (months > 0) {
-      durationString += months + ' Month ';
-    }
-    if (days > 0) {
-       durationString += days + ' Day';
-    }
-  
-    return durationString.trim(); // Hilangkan spasi ekstra di akhir
+  if(startDate instanceof Date && endDate instanceof Date){
+    getObjStartDate = startDate;
+    getObjEndDate = endDate;
+  } else {
+    getObjStartDate = new Date(startDate);
+    getObjEndDate = new Date(endDate);
   }
 
-    
+  const totalMilliseconds = getObjEndDate - getObjStartDate;
+
+  // Konversi ke hari, jam, menit, detik, dan milidetik
+  const totalSeconds = totalMilliseconds / 1000;
+  const totalMinutes = totalSeconds / 60;
+  const totalHours = totalMinutes / 60;
+  const totalDays = totalHours / 24;
+
+  // Hitung jumlah tahun, bulan, dan sisa hari
+  const years = Math.floor(totalDays / 365);
+  const months = Math.floor((totalDays % 365) / 30); // perkiraan 30 hari per bulan
+  const days = Math.floor(totalDays % 30);
+
+  // Buat string durasi
+  let durationString = '';
+  if (years > 0) {
+    durationString += years + ' Year ';
+  }
+  if (months > 0) {
+    durationString += months + ' Month ';
+  }
+  if (days > 0) {
+      durationString += days + ' Day';
+  }
+
+  return durationString.trim(); // Hilangkan spasi ekstra di akhir
+}
+
 function formatDate(dates) {
   //date formater d/mm/yyyy
   let objDates;
@@ -144,7 +146,14 @@ async function home(req, res) {
     }));
 
     const title = "Personal Web"
-    res.render("index", { projects, title });
+
+    res.render("index", { 
+      projects, 
+      title, 
+      isLogin: req.session.isLogin, 
+      user: req.session.user 
+    });
+
   } catch (error) {
     throw error;
   }
@@ -153,12 +162,20 @@ async function home(req, res) {
 
 function contact(req, res) {
   const title = "Contact Me"
-  res.render("contact", {title});
+  res.render("contact", {
+    title,
+    isLogin: req.session.isLogin, 
+    user: req.session.user 
+  });
 }
 
 function addProject(req, res) {
   const title = "Add Project"
-  res.render("create-project", {title});
+  res.render("create-project", {
+    title,
+    isLogin: req.session.isLogin, 
+    user: req.session.user 
+  });
 }
 
 async function storeProject(req, res) {
@@ -192,7 +209,15 @@ async function projectDetail(req, res) {
     const formatStartDate = formatDate(dataProject.start_date);
     const formatEndDate = formatDate(dataProject.end_date);
     const title = "Detail Project"
-    res.render("show-project", { dataProject, title, duration_project, formatStartDate, formatEndDate });
+    res.render("show-project", { 
+      dataProject, 
+      title, 
+      duration_project, 
+      formatStartDate, 
+      formatEndDate, 
+      isLogin: req.session.isLogin, 
+      user: req.session.user  
+    });
   } catch (error) {
     throw error;
   }
@@ -221,7 +246,12 @@ async function editProject(req, res) {
   
     // console.log(projectDetail);
     const title = "Edit Project"
-    res.render("edit-project", { dataProject, title });
+    res.render("edit-project", { 
+      dataProject, 
+      title, 
+      isLogin: req.session.isLogin, 
+      user: req.session.user  
+    });
   } catch (error) {
     throw error;
   }
@@ -238,26 +268,80 @@ async function updateProject(req, res) {
   } catch (error) {
     throw error
   }
-
-//   const updateData = {
-//     projectName,
-//     startDate,
-//     endDate,
-//     description,
-//     tech: {
-//       node: req.body.tech && req.body.tech.includes("node"),
-//       laravel: req.body.tech && req.body.tech.includes("laravel"),
-//       python: req.body.tech && req.body.tech.includes("python"),
-//       react: req.body.tech && req.body.tech.includes("react"),
-//     },
-//   };
-
-//   data.splice(id, 1, updateData);
-
-//   res.redirect("/");
 }
 
+function formLogin(req, res) {
+  const title = "Log In"
+  res.render("login", {
+    title,
+    isLogin: req.session.isLogin, 
+    user: req.session.user 
+  });
+}
+
+async function handleLogin(req, res) {
+  try {
+    const { email, password} = req.body;
+
+    const checkEmail = await SequelizePool.query(`SELECT * FROM users where email = '${email}'`, {type: QueryTypes.SELECT})
+
+    if(!checkEmail.length){
+      return res.redirect('/login');
+    }
+
+    bcrypt.compare(password, checkEmail[0].password, function(err, result) {
+      if(!result){
+        return res.redirect('/login');
+      } else {
+        req.session.isLogin = true;
+        req.session.user = checkEmail[0].name
+        return res.redirect('/');
+      }
+    })
+
+
+
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+function formRegister(req, res) {
+  const title = "Sign Up"
+  res.render("register", {
+    title,
+    isLogin: req.session.isLogin, 
+    user: req.session.user 
+  });
+}
+
+async function handleRegister(req, res) {
+  try {
+    const { name, email, password } = req.body;
+    const salt = 10
+
+    bcrypt.hash(password, salt, async (err, hashPassword)=> {
+      await SequelizePool.query(`
+      INSERT INTO users (name, email, password, "createdAt", "updatedAt")
+      VALUES ('${name}', '${email}', '${hashPassword}', NOW(), NOW())`)
+    });
+     
+    res.redirect("/");
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+function logout(req, res) {
+  if(req.session.isLogin) {
+    req.session.isLogin = false;
+    res.redirect("/");
+  } else {
+    res.redirect("/");
+  }
+}
 function testimonial(req, res) {
+  
   res.render("testimonial");
 }
 

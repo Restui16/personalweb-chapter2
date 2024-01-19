@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personal Web</title>
+    <title>{{title}}</title>
     <!-- <link rel="stylesheet" href="assets/css/app.css"> -->
     <link rel="stylesheet" href="assets/css/style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -12,8 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 
-<body>
-
+<body class="">
      <nav class="navbar sticky-top navbar-expand-lg bg-white shadow z-3">
         <div class="container">
             <a class="navbar-brand" href="/">
@@ -52,60 +51,48 @@
                             </ul>
                         </li>
                     {{else}}
-                    <li class="nav-item"> <a class="nav-link" href="/register">Register</a> </li>
+                    <li class="nav-item"> <a class="nav-link fw-bold active" aria-current="page"  href="/register">Register</a> </li>
                     <li class="nav-item me-3"> <a class="nav-link" href="/login">Login</a> </li>
                     {{/if}}
-                    <li class="nav-item"><a href="/contact" class="btn btn-custom-dark rounded-pill fw-bold active" aria-current="page">Contact Me</a></li>
+                    <li class="nav-item"><a href="/contact" class="btn btn-custom-dark rounded-pill">Contact Me</a></li>
                 </ul>
             </div>
         </div>
     </nav>
 
-
-    <main class="my-5">
-        <section id="contact-me">
-            <h1 class="text-center">GET IN TOUCH</h1>
-            <div class="container-fluid">
-                <div class="col-lg-4 col-md-6 col-sm-8 x col-xs-12 mx-auto">
-                        <form action="" onsubmit="submitData()">
-                            <div class="form-group mb-3">
-                                <label for="name">Name</label>
-                                <input type="text" class="form-control" id="name">
-                            </div>
-
-                            <div class="form-group mb-3">
-                                <label for="email">Email</label>
-                                <input type="email" class="form-control" id="email">
-                            </div>
-                            <div class="form-group mb-3">
-                                <label for="phoneNumber">Phone Number</label>
-                                <input type="tel" class="form-control" id="phoneNumber">
-                            </div>
-                            <div class="form-group mb-3">
-                                <label for="subject">Subject</label>
-                                <select id="subject" class="form-select">
-                                    <option value="" selected>Choose One</option>
-                                    <option value="Frontend Developer">Frontend Developer</option>
-                                    <option value="Backend Developer">Backend Developer</option>
-                                    <option value="Fullstack Developer">Fullstack Developer</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group mb-3">
-                                <label for="message">Your Massage</label>
-                                <textarea id="message" class="form-control" rows="5"></textarea>
-                            </div>
-
-                            <div class="d-flex justify-content-end">
-                                <button type="submit" class="btn btn-custom-dark">Submit</button>
-                            </div>
-                        </form>
-                </div>
+    <main class="" style="margin-top: -60px; height: 100vh;">
+       <div class="container h-100 d-flex flex-column gap-3 justify-content-center align-items-center">
+        <div>
+            <img src="/assets/img/dumbways.png" class="" style="width: 100px;" alt="logo">
+        </div>
+        <div class="card col-lg-5 col-md-6 col-sm-8 x col-xs-12 border-0 rounded-4 shadow">
+            <div class="card-body">
+                <form action="/register" method="post">
+                    <div class="row">
+                        <div class="mb-4">
+                            <label for="name" class="fw-bold fs-5">Name</label>
+                            <input type="text" name="name" id="name" class="form-control" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="email" class="fw-bold fs-5">Email</label>
+                            <input type="email" name="email" id="email" class="form-control" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="password" class="fw-bold fs-5">Password</label>
+                            <input type="password" name="password" id="password" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end align-items-center gap-3">
+                        <button type="submit" class="btn btn-custom-dark me-3 order-2">Sign Up</button>
+                        <span class="order-1">Already have an account?<a href="/login">Log In</a></span>
+                    </div>
+                </form>
             </div>
-        </section>
+        </div>
+       </div>
     </main>
 
-    <script src="/assets/js/contact.js"></script>
+    <!-- <script src="assets/js/nav.js"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
         integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
         crossorigin="anonymous"></script>
