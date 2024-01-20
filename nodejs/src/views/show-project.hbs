@@ -33,7 +33,7 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link fw-bold active" href="/">Home</a>
+                        <a class="nav-link" href="/">Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link fw-bold active" aria-current="page" href="/add-project">Add Project</a>
@@ -93,7 +93,7 @@
               {{#each dataProject.tech}}
                 <span class="col-6 mb-3 fs-3 text-capitalize">
                   <i class="fa-brands fa-{{this}} me-3"></i>
-                  {{this}}
+                  {{#if (arrayContains this 'node-js')}} Node Js {{else}} {{this}} {{/if}}
                 </span>
               {{/each}}
             </div>

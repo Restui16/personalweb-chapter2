@@ -271,6 +271,7 @@ async function editProject(req, res) {
       `SELECT * FROM projects WHERE id = ${id}`, { type: QueryTypes.SELECT });
     // console.log(query);
     
+  
     const projectDetail = query.map(value => ({
       ...value,
       startDate: value.start_date.toISOString().split("T")[0],
@@ -330,7 +331,7 @@ async function handleLogin(req, res) {
       } else {
         req.session.isLogin = true;
         req.session.user = checkEmail[0].name
-        req.flash('success', 'You have successfully logged in')
+        req.flash('success', 'Login successfully')
         return res.redirect('/');
       }
     })
@@ -359,9 +360,12 @@ async function handleRegister(req, res) {
       VALUES ('${name}', '${email}', '${hashPassword}', NOW(), NOW())`)
     });
      
-    res.redirect("/");
+    req.flash('success', 'Your account has been successfully created')
+    res.redirect("/login");
   } catch (error) {
+    req.flash('error', 'Something when wrong')
     console.log(error);
+    
   }
 }
 
