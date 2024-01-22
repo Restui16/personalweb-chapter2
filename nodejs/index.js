@@ -5,15 +5,21 @@ const { Sequelize, QueryTypes, ARRAY } = require("sequelize");
 const bcrypt = require("bcrypt");
 const session = require("express-session");
 const flash = require("express-flash");
+const upload = require("./src/middleware/uploadFile");
 
 const app = express();
 const port = 3000;
 
+const SequelizePool = new Sequelize(development);
+let models = require("./src/models");
+const project = require("./src/models/project");
+const { types } = require("pg");
 
 app.set("view engine", "hbs"); // set view engine hbs
 app.set("views", "src/views"); // set path views to src/views
-app.use(express.urlencoded({ extended: false }));
+app.use('/uploads', express.static('src/uploads'));
 app.use("/assets", express.static("src/assets"));
+app.use(express.urlencoded({ extended: false })); //body parser
 app.use(session({
   cookie: {
     httpOnly: true,
@@ -25,30 +31,22 @@ app.use(session({
   secret: 'session_storage',
   saveUninitialized: true
 }))
-
 app.use(flash());
 
 app.get("/", home);
 app.get("/contact", contact);
 app.get("/add-project", addProject);
-app.post("/add-project", storeProject);
+app.post("/add-project", upload.single('image'), storeProject);
 app.get("/project/detail/:id", projectDetail);
 app.get("/project/delete/:id", deleteProject);
 app.get("/project/edit/:id", editProject);
-app.post("/project/update/:id", updateProject);
+app.post("/project/update/:id", upload.single('image'), updateProject);
 app.get("/login", formLogin);
 app.post("/login", handleLogin);
 app.get("/register", formRegister);
 app.post("/register", handleRegister);
 app.get("/logout", logout);
 app.get("/testimonial", testimonial);
-
-
-
-const SequelizePool = new Sequelize(development);
-let models = require("./src/models");
-const project = require("./src/models/project");
-const { types } = require("pg");
 
 async function connectToDatabase() {
   try {
@@ -59,39 +57,14 @@ async function connectToDatabase() {
   }
 }
 
-// connectToDatabase();
-
-app.set("view engine", "hbs"); // set view engine hbs
-
-app.set("views", "src/views"); // set path views to src/views
-
-app.use(express.urlencoded({ extended: false }));
-
-app.use("/assets", express.static("src/assets"));
-
-app.get("/", home);
-
-app.get("/contact", contact);
-
-app.get("/add-project", addProject);
-
-app.post("/add-project", storeProject);
-
-app.get("/project/detail/:id", projectDetail);
-
-app.get("/project/delete/:id", deleteProject);
-
-app.get("/project/edit/:id", editProject);
-
-app.post("/project/update/:id", updateProject);
-
-app.get("/testimonial", testimonial);
-
-const data = ['test'];
 connectToDatabase();
 
 hbs.registerHelper('arrayContains', function (array, value) {
   return array.includes(value);
+});
+
+hbs.registerHelper('eq', function (a, b, options) {
+  if (a === b) return true
 });
 
 function calculateDuration(startDate, endDate) {
@@ -165,23 +138,21 @@ function formatDate(dates) {
 
 async function home(req, res) {
   try {
-    const query = await SequelizePool.query("SELECT * FROM projects", {
-      type: QueryTypes.SELECT,
-    });
+    const query = await SequelizePool.query(`SELECT projects.id, project_name, start_date, end_date, description, tech, image, projects."createdAt", users.name as author FROM projects LEFT JOIN users ON projects.user_id = users.id`, { type: QueryTypes.SELECT,});
     // console.log(query);
     const projects = query.map((value) => ({
       ...value,
       duration_project: calculateDuration(value.start_date, value.end_date),
-      subs_desc: value.description.substring(0,150)
+      subs_desc: value.description.substring(0,150),
+      isLogin: req.session.isLogin,
+      user: req.session.user 
     }));
 
+    const isLogin = req.session.isLogin
+    const user = req.session.user
     const title = "Personal Web"
 
-    res.render("index", { 
-      projects, 
-      title, 
-      isLogin: req.session.isLogin, 
-      user: req.session.user 
+    res.render("index", { projects, title, isLogin, user
     });
 
   } catch (error) {
@@ -211,11 +182,15 @@ function addProject(req, res) {
 async function storeProject(req, res) {
   try {
     const { projectName, startDate, endDate, description, tech } = req.body;
+    const image = req.file.filename;
+    const userId = req.session.userId;
+    
+
     await SequelizePool.query(`
       INSERT INTO projects(
-        project_name, start_date, end_date, description, tech, "createdAt", "updatedAt"
+        project_name, start_date, end_date, description, tech, image, user_id, "createdAt", "updatedAt"
       ) VALUES (
-        '${projectName}', '${startDate}', '${endDate}', '${description}', ARRAY['${tech.join("','")}'::character varying], NOW(), NOW())`);
+        '${projectName}', '${startDate}', '${endDate}', '${description}', '{${tech}}', '${image}', ${userId}, NOW(), NOW())`);
     req.flash('success', 'Project has been created');    
     res.redirect('/');
   } catch (error) {
@@ -227,15 +202,15 @@ async function storeProject(req, res) {
 async function projectDetail(req, res) {
   const { id } = req.params
   try {
-    const query = await SequelizePool.query(
-      `SELECT * FROM projects WHERE id = ${id}`, { type: QueryTypes.SELECT });
+    const query = await SequelizePool.query(`SELECT projects.id, project_name, start_date, end_date, description, tech, image, projects."createdAt", users.name as author FROM projects LEFT JOIN users ON projects.user_id = users.id WHERE projects.id = ${id}`, { type: QueryTypes.SELECT,});
     // console.log(query);
     
     const projectDetail = query.map(value => ({
       ...value,
       duration_project: calculateDuration(value.start_date, value.end_date),
       formatStartDate: formatDate(value.start_date),
-      formatEndDate: formatDate(value.end_date)
+      formatEndDate: formatDate(value.end_date),
+      formatCreatedAt: formatDate(value.createdAt)
     }))
 
     const [dataProject] = projectDetail
@@ -267,8 +242,8 @@ async function deleteProject(req, res) {
 async function editProject(req, res) {
   const { id } = req.params;
   try {
-    const query = await SequelizePool.query(
-      `SELECT * FROM projects WHERE id = ${id}`, { type: QueryTypes.SELECT });
+    const query = await SequelizePool.query(`SELECT projects.id, project_name, start_date, end_date, description, tech, image, projects."createdAt", users.name as author FROM projects LEFT JOIN users ON projects.user_id = users.id WHERE projects.id = ${id}`, 
+    { type: QueryTypes.SELECT,});
     // console.log(query);
     
   
@@ -279,6 +254,8 @@ async function editProject(req, res) {
     }))
     const [ dataProject ] = projectDetail
     
+    // console.log(dataProject);
+
     const title = "Edit Project"
     res.render("edit-project", { 
       dataProject, 
@@ -295,8 +272,20 @@ async function updateProject(req, res) {
   const { id } = req.params;
   try {
     const { projectName, startDate, endDate, description, tech } = req.body;
+    const image = req.file.filename
     
-    await SequelizePool.query(`UPDATE projects SET project_name='${projectName}', start_date='${startDate}', end_date='${endDate}', description='${description}', tech=ARRAY['${tech.join("','")}'::character varying], "updatedAt"=NOW()  WHERE id = ${id}`);
+    await SequelizePool.query(`UPDATE projects 
+    SET 
+      project_name='${projectName}', 
+      start_date='${startDate}', 
+      end_date='${endDate}', 
+      description='${description}', 
+      tech='{${tech}}', 
+      image='${image}', 
+      "updatedAt"=NOW() 
+    WHERE 
+      id = ${id};`);
+      
     req.flash('success', 'Project has been updated')
     res.redirect("/");
   } catch (error) {
@@ -330,7 +319,8 @@ async function handleLogin(req, res) {
         return res.redirect('/login');
       } else {
         req.session.isLogin = true;
-        req.session.user = checkEmail[0].name
+        req.session.user = checkEmail[0].name;
+        req.session.userId = checkEmail[0].id;
         req.flash('success', 'Login successfully')
         return res.redirect('/');
       }
@@ -372,6 +362,7 @@ async function handleRegister(req, res) {
 function logout(req, res) {
   if(req.session.isLogin) {
     req.session.isLogin = false;
+    req.session.user = null;
     req.flash('success', 'Logout successful')
     res.redirect("/");
   } else {

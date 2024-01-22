@@ -27,6 +27,18 @@ module.exports = {
       tech: {
         type: Sequelize.ARRAY(Sequelize.STRING)
       },
+      image: {
+        type: Sequelize.TEXT
+      },
+      user_id: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'users',
+          key: 'id'
+        },
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE'
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

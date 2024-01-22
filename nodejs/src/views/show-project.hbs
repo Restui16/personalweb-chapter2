@@ -71,11 +71,12 @@
       <div class="container">
         <div class="row">
           <h1 class="text-center text-uppercase fw-bold my-4">{{dataProject.project_name}}</h1>
-          <div class="col-12 col-lg-6 mb-5 d-flex">
+          <div class="col-12 col-lg-6 mb-3 d-flex">
             <img
-              src="/assets/img/img1.jpg"
-              class="w-100 h-100 object-fit-cover"
-              alt=""
+              src="/uploads/{{dataProject.image}}"
+              class="w-100 object-fit-cover"
+              alt="img"
+              style="height: 430px;"
             />
           </div>
           <div class="col-12 col-lg-6 p-md-5">
@@ -98,9 +99,10 @@
               {{/each}}
             </div>
           </div>
+          <p class="text-muted">{{dataProject.formatCreatedAt}} | Created By {{dataProject.author}}</p>
         </div>
 
-        <div class="row">
+        <div class="row"> 
           <p class="fs-4" style="text-align: justify;">
             {{dataProject.description}}
           </p>
