@@ -6,6 +6,7 @@ const bcrypt = require("bcrypt");
 const session = require("express-session");
 const flash = require("express-flash");
 const upload = require("./src/middleware/uploadFile");
+const fs = require("fs");
 
 const app = express();
 const port = 3000;
@@ -67,6 +68,9 @@ hbs.registerHelper('eq', function (a, b, options) {
   if (a === b) return true
 });
 
+function deleteImage(imagePath) {
+  fs.unlinkSync(imagePath);
+}
 function calculateDuration(startDate, endDate) {
 
   let getObjStartDate;
@@ -185,17 +189,33 @@ async function storeProject(req, res) {
     const image = req.file.filename;
     const userId = req.session.userId;
     
+    if(!userId) {
+      req.flash('error', 'You must login')
+      res.redirect('/add-project')
+    }
 
     await SequelizePool.query(`
       INSERT INTO projects(
-        project_name, start_date, end_date, description, tech, image, user_id, "createdAt", "updatedAt"
+        project_name, 
+        start_date,  end_date, 
+        description, tech, 
+        image, user_id, 
+        "createdAt", "updatedAt"
       ) VALUES (
-        '${projectName}', '${startDate}', '${endDate}', '${description}', '{${tech}}', '${image}', ${userId}, NOW(), NOW())`);
+        '${projectName}', 
+        '${startDate}', '${endDate}', 
+        '${description}', '{${tech}}', 
+        '${image}', ${userId}, 
+        NOW(), NOW()
+      )`
+    );
+
     req.flash('success', 'Project has been created');    
     res.redirect('/');
   } catch (error) {
-    req.flash('error', 'Project has failed to create'); 
-    throw error;
+    req.flash('error', 'Project has failed to create');
+    deleteImage(__dirname + '/src/uploads/' + req.file.filename)
+    res.redirect('/add-project')
   }
 }
 
@@ -230,8 +250,16 @@ async function projectDetail(req, res) {
 async function deleteProject(req, res) {
   const { id } = req.params;
   try {
+    const query = await SequelizePool.query(`SELECT * FROM projects where id = ${id}`, {type: QueryTypes.SELECT})
+
+    const [result] = query
+    if(result){
+      const imagePath = __dirname + "/src/uploads/" + result.image;
+      deleteImage(imagePath)
+    }
+    
     await SequelizePool.query(`DELETE FROM projects WHERE id = ${id}`)
-    req.flash('success', 'Project has been deleted')
+    req.flash('success', `Project ${result.project_name} has been deleted` )
     res.redirect("/");
 
   } catch (error) {
@@ -271,9 +299,8 @@ async function editProject(req, res) {
 async function updateProject(req, res) {
   const { id } = req.params;
   try {
-    const { projectName, startDate, endDate, description, tech } = req.body;
+    const { projectName, startDate, endDate, description, tech} = req.body;
     const image = req.file.filename
-    
     await SequelizePool.query(`UPDATE projects 
     SET 
       project_name='${projectName}', 
@@ -285,7 +312,7 @@ async function updateProject(req, res) {
       "updatedAt"=NOW() 
     WHERE 
       id = ${id};`);
-      
+
     req.flash('success', 'Project has been updated')
     res.redirect("/");
   } catch (error) {

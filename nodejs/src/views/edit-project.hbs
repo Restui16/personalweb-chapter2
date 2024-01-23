@@ -29,9 +29,11 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/">Home</a>
                     </li>
+                    {{#if isLogin}}
                     <li class="nav-item">
                         <a class="nav-link fw-bold active" aria-current="page" href="/add-project">Add Project</a>
                     </li>
+                    {{/if}}
                 </ul>
 
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
@@ -48,7 +50,7 @@
                                     </a>
                                 </li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="#">Logout <i class="fa-solid fa-right-from-bracket text-danger ms-2"></i></a></li>
+                                <li><a class="dropdown-item" href="/logout">Logout <i class="fa-solid fa-right-from-bracket text-danger ms-2"></i></a></li>
                             </ul>
                         </li>
                     {{else}}
@@ -67,6 +69,7 @@
             <div class="col-lg-4 col-md-6 col-sm-8 x col-xs-12 mx-auto">
                 <form action="/project/update/{{dataProject.id}}" method="POST" enctype="multipart/form-data">
                     <div class="row">
+                        
                         <div class="col-12 mb-3">
                             <div class="form-group">
                                 <label for="projectName">Project Name</label>

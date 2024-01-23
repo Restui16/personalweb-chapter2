@@ -20,6 +20,18 @@ body {
 input, select, textarea {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
+
+#containerSwal {
+  position: absolute;
+  top: 80%;
+  right: 0;
+  width: 350px;
+  height: 150px;
+}
+
+#containerSwal .swal2-container {
+  position: inherit; 
+}
 /* // X-Small devices (portrait phones, less than 576px)
 // No media query for `xs` since this is the default in Bootstrap */
 
