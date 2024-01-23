@@ -6,7 +6,10 @@ const bcrypt = require("bcrypt");
 const session = require("express-session");
 const flash = require("express-flash");
 const upload = require("./src/middleware/uploadFile");
-const fs = require("fs");
+const fs = require("fs/promises");
+const checkAuth = require('./src/middleware/checkAuth');
+
+console.log(checkAuth);
 
 const app = express();
 const port = 3000;
@@ -36,12 +39,12 @@ app.use(flash());
 
 app.get("/", home);
 app.get("/contact", contact);
-app.get("/add-project", addProject);
-app.post("/add-project", upload.single('image'), storeProject);
-app.get("/project/detail/:id", projectDetail);
-app.get("/project/delete/:id", deleteProject);
-app.get("/project/edit/:id", editProject);
-app.post("/project/update/:id", upload.single('image'), updateProject);
+app.get("/add-project", checkAuth, addProject);
+app.post("/add-project", upload.single('image'), checkAuth, storeProject);
+app.get("/project/detail/:id", checkAuth, projectDetail);
+app.get("/project/delete/:id", checkAuth, deleteProject);
+app.get("/project/edit/:id", checkAuth, editProject);
+app.post("/project/update/:id", upload.single('image'), checkAuth, updateProject);
 app.get("/login", formLogin);
 app.post("/login", handleLogin);
 app.get("/register", formRegister);
@@ -68,9 +71,14 @@ hbs.registerHelper('eq', function (a, b, options) {
   if (a === b) return true
 });
 
-function deleteImage(imagePath) {
-  fs.unlinkSync(imagePath);
+async function deleteImage(imagePath) {
+  try {
+    await fs.unlink(imagePath);
+  } catch (error) {
+    console.error(`error deleting file: ${imagePath}`, error)  
+  }
 }
+
 function calculateDuration(startDate, endDate) {
 
   let getObjStartDate;
@@ -140,9 +148,11 @@ function formatDate(dates) {
   return `${date} ${months[month]} ${year}`;
 }
 
+
+
 async function home(req, res) {
   try {
-    const query = await SequelizePool.query(`SELECT projects.id, project_name, start_date, end_date, description, tech, image, projects."createdAt", users.name as author FROM projects LEFT JOIN users ON projects.user_id = users.id`, { type: QueryTypes.SELECT,});
+    const query = await SequelizePool.query(`SELECT projects.id, project_name, start_date, end_date, description, tech, image, projects."createdAt", users.name as author FROM projects LEFT JOIN users ON projects.user_id = users.id ORDER BY COALESCE(projects."updatedAt", projects."createdAt") DESC, id DESC`, { type: QueryTypes.SELECT,});
     // console.log(query);
     const projects = query.map((value) => ({
       ...value,
@@ -299,8 +309,8 @@ async function editProject(req, res) {
 async function updateProject(req, res) {
   const { id } = req.params;
   try {
-    const { projectName, startDate, endDate, description, tech} = req.body;
-    const image = req.file.filename
+    const { oldImg, projectName, startDate, endDate, description, tech} = req.body;
+    const image = req.file ? req.file.filename : oldImg ;
     await SequelizePool.query(`UPDATE projects 
     SET 
       project_name='${projectName}', 
@@ -312,6 +322,10 @@ async function updateProject(req, res) {
       "updatedAt"=NOW() 
     WHERE 
       id = ${id};`);
+
+    if(image != oldImg){
+      deleteImage(__dirname + '/src/uploads/' + oldImg)
+    }
 
     req.flash('success', 'Project has been updated')
     res.redirect("/");
